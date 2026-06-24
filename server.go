@@ -15,16 +15,17 @@ type runInput struct {
 // command line to the in-editor bridge.
 func serve(ctx context.Context, addr, token string) error {
 	server := mcp.NewServer(&mcp.Implementation{
-		Name:    "editor-console",
+		Name:    "godot-editor-console",
 		Version: "0.1.0",
 	}, nil)
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "run_console_command",
 		Description: "Run an editor_console command line in the live Godot editor and return its output. " +
-			"Supports the full console surface: 'dev' commands, pipes (|), '&&'/'||', ';', and gdsh scripts. " +
-			"Example: 'dev tree --type=Sprite2D | dev count'. Requires the editor open with the addon enabled " +
-			"and 'dev bridge start' run once.",
+			"Supports the full command surface: pipes (|), '&&'/'||', ';', and gdsh scripts. " +
+			"Call 'list_commands' first to discover commands. " +
+			"Example: 'scene edited tree --type=Sprite2D | count'. " +
+			"Requires the editor open with the addon enabled and 'mcp bridge start' run once.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in runInput) (*mcp.CallToolResult, any, error) {
 		resp, err := runCommand(addr, token, in.Command)
 		if err != nil {
@@ -53,10 +54,10 @@ func serve(ctx context.Context, addr, token string) error {
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "list_commands",
-		Description: "List the available editor_console 'dev' commands (runs 'dev --help'). " +
+		Description: "List the available editor_console 'dev' commands (runs 'mcp list_commands'). " +
 			"Use this to discover the command surface before calling run_console_command.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, _ struct{}) (*mcp.CallToolResult, any, error) {
-		resp, err := runCommand(addr, token, "dev --help")
+		resp, err := runCommand(addr, token, "mcp list_commands")
 		if err != nil {
 			return &mcp.CallToolResult{
 				IsError: true,

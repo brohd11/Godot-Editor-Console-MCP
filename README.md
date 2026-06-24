@@ -1,16 +1,16 @@
-# editor-console-mcp
+# godot-editor-console-mcp
 
-A thin **Go MCP server + CLI** that drives the `editor_console` addon's command surface
+A thin **Go MCP server + CLI** that drives the `Godot Editor Console` addon's command surface
 (`dev` commands, pipes, gdsh) in the **live Godot editor**.
 
 It exposes two MCP tools that forward to a small loopback TCP listener inside the editor:
 - **`run_console_command`** — run any command line and return its output. Because it reuses
-  the console's own execution path, the full surface works: `dev` commands, pipes (`|`),
+  the console's own execution path, the full surface works: commands, pipes (`|`),
   `&&`/`||`, `;`, and gdsh.
-- **`list_commands`** — list the available `dev` commands (runs `dev --help`) for discovery.
+- **`list_commands`** — list the available commands for discovery.
 
 ```
-Claude Code ──stdio MCP──▶ editor-console-mcp ──TCP 127.0.0.1:9510──▶ editor_console bridge ──▶ live editor
+Claude Code ──stdio MCP──▶ godot-editor-console-mcp ──TCP 127.0.0.1:9510──▶ editor_console bridge ──▶ live editor
 ```
 
 ## How it works
@@ -22,34 +22,34 @@ Claude Code ──stdio MCP──▶ editor-console-mcp ──TCP 127.0.0.1:9510
 ## Build
 
 ```bash
-make            # host build  -> build/<os>-<arch>/editor-console-mcp
+make            # host build  -> build/<os>-<arch>/godot-editor-console-mcp
 make all        # all targets -> build/{darwin-arm64,darwin-amd64,linux-amd64,linux-arm64,windows-amd64}/
 make clean      # remove build/
 ```
 
-Builds are static (`CGO_ENABLED=0`) and stripped. The Windows target is `editor-console-mcp.exe`.
+Builds are static (`CGO_ENABLED=0`) and stripped. The Windows target is `godot-editor-console-mcp.exe`.
 
 ## Use
 
 **1. Start the bridge in the editor** (once per session — it's off by default):
 
 ```
-dev bridge start          # listens on 127.0.0.1:9510
-dev bridge status
+mcp bridge start          # listens on 127.0.0.1:9510
+mcp bridge status
 ```
 
 **2a. As an MCP server** — register with Claude Code:
 
 ```bash
-claude mcp add editor-console -- /abs/path/to/build/<os>-<arch>/editor-console-mcp
+claude mcp add godot-editor-console -- /abs/path/to/build/<os>-<arch>/godot-editor-console-mcp
 ```
 
-Then ask Claude to use the `run_console_command` tool, e.g. *"run `dev tree | dev count`"*.
+Then ask Claude to use the `run_console_command` tool, e.g. *"run `scene edited tree | count`"*.
 
 **2b. As a CLI** (talks to the same live editor, no headless boot):
 
 ```bash
-./build/<os>-<arch>/editor-console-mcp run "dev tree --type=Sprite2D | dev count"
+./build/<os>-<arch>/godot-editor-console-mcp run "scene edited tree --type=Sprite2D | count"
 ```
 
 stdout goes to stdout, stderr to stderr, and the process exit code mirrors the command's.
@@ -60,9 +60,9 @@ The bridge is off by default. To start it automatically when the editor loads, a
 startup command (reuses the addon's existing startup mechanism):
 
 ```
-config startup --add "dev bridge start"
+config startup --add "mcp bridge start"
 # or with a token / custom port:
-config startup --add "dev bridge start 9510 mytoken"
+config startup --add "mcp bridge start 9510 mytoken"
 ```
 
 ## Token auth (optional)
@@ -70,12 +70,12 @@ config startup --add "dev bridge start 9510 mytoken"
 Start the bridge with a shared secret and give the same value to the client:
 
 ```
-dev bridge start 9510 mytoken          # in the console
+mcp bridge start 9510 mytoken          # in the console
 ```
 ```bash
-claude mcp add editor-console --env EDITOR_CONSOLE_TOKEN=mytoken -- /abs/path/to/build/<os>-<arch>/editor-console-mcp
+claude mcp add godot-editor-console --env EDITOR_CONSOLE_TOKEN=mytoken -- /abs/path/to/build/<os>-<arch>/godot-editor-console-mcp
 # or for the CLI:
-EDITOR_CONSOLE_TOKEN=mytoken ./build/<os>-<arch>/editor-console-mcp run "dev ls res://"
+EDITOR_CONSOLE_TOKEN=mytoken ./build/<os>-<arch>/godot-editor-console-mcp run "ls res://"
 ```
 Requests with a missing/wrong token get an `Unauthorized` response.
 
@@ -83,18 +83,18 @@ Requests with a missing/wrong token get an `Unauthorized` response.
 
 | Env var | Default | Purpose |
 |---|---|---|
-| `EDITOR_CONSOLE_PORT` | `9510` | Bridge port (must match `dev bridge start <port>`). |
+| `EDITOR_CONSOLE_PORT` | `9510` | Bridge port (must match `mcp bridge start <port>`). |
 | `EDITOR_CONSOLE_TOKEN` | _(none)_ | Shared secret; if set, must match the token the bridge was started with. |
 
 For Claude Code, pass env in the MCP registration, e.g.:
 
 ```bash
-claude mcp add editor-console --env EDITOR_CONSOLE_PORT=9510 -- /abs/path/to/build/<os>-<arch>/editor-console-mcp
+claude mcp add godot-editor-console --env EDITOR_CONSOLE_PORT=9510 -- /abs/path/to/build/<os>-<arch>/godot-editor-console-mcp
 ```
 
 ## Security
 
-- The bridge binds **loopback only** and is **off by default** — you must run `dev bridge start`.
+- The bridge binds **loopback only** and is **off by default** — you must run `mcp bridge start`.
 - `run_console_command` is effectively remote control of your editor. Keep it local; do not
   expose the port. Use `EDITOR_CONSOLE_TOKEN` for a basic shared-secret check.
 
@@ -103,6 +103,6 @@ claude mcp add editor-console --env EDITOR_CONSOLE_PORT=9510 -- /abs/path/to/bui
 Newline-delimited JSON over TCP:
 
 ```
-→ {"id":1,"cmd":"dev tree | dev count","token":"optional"}\n
+→ {"id":1,"cmd":"scene edited tree | count","token":"optional"}\n
 ← {"id":1,"stdout":"...","stderr":"...","exit_code":0}\n
 ```

@@ -2,4 +2,4 @@
 /bin/
 *.exe
 .DS_Store
-/editor-console-mcp
+/godot-editor-console-mcp

@@ -27,7 +27,7 @@ func runCommand(addr, token, cmd string) (response, error) {
 	conn, err := net.DialTimeout("tcp", addr, 5*time.Second)
 	if err != nil {
 		return response{}, fmt.Errorf("could not connect to the Godot bridge at %s: %w\n"+
-			"(open the editor with the editor_console addon enabled and run 'dev bridge start')", addr, err)
+			"(open the editor with the editor_console addon enabled and run 'mcp bridge start')", addr, err)
 	}
 	defer conn.Close()
 

@@ -9,8 +9,8 @@ OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 
 # Resolve paths relative to this script so it works from any working directory.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NAME="editor-console"
-BIN="$SCRIPT_DIR/build/$OS-$ARCH/editor-console-mcp"
+NAME="godot-editor-console"
+BIN="$SCRIPT_DIR/build/$OS-$ARCH/godot-editor-console-mcp"
 
 if [[ ! -x "$BIN" ]]; then
   echo "Binary not found: $BIN" >&2

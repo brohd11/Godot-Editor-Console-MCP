@@ -19,10 +19,10 @@ func main() {
 	addr := defaultAddr()
 	token := os.Getenv("EDITOR_CONSOLE_TOKEN")
 
-	// One-shot CLI mode: `editor-console-mcp run "<command>"`.
+	// One-shot CLI mode: godot-editor-console-mcp run "<command>"`.
 	if len(os.Args) > 1 && os.Args[1] == "run" {
 		if len(os.Args) < 3 {
-			fmt.Fprintln(os.Stderr, `usage: editor-console-mcp run "<command>"`)
+			fmt.Fprintln(os.Stderr, `usage: godot-editor-console-mcp run "<command>"`)
 			os.Exit(2)
 		}
 		resp, err := runCommand(addr, token, os.Args[2])

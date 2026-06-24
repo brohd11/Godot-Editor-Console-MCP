@@ -1,4 +1,4 @@
-module editor-console-mcp
+module godot-editor-console-mcp
 
 go 1.26
 
