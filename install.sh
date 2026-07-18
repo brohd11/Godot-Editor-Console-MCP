@@ -16,7 +16,7 @@ set -eu
 # ---- config ----
 REPO="brohd11/Godot-Editor-Console-MCP"
 BINARY="godot-editor-console-mcp"
-ARCHIVE_EXT="tar.gz"
+ARCHIVE_EXT="zip"
 SUPPORTED="darwin-arm64 darwin-amd64 linux-amd64 linux-arm64"
 
 # Printed after a successful install. Leave the body as ':' for nothing.

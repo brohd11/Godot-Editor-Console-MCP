@@ -1,5 +1,6 @@
 BINARY    := godot-editor-console-mcp
 BUILD     := build
+DIST      := dist
 VERSION   ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS   := -s -w -X main.version=$(VERSION)
 PLATFORMS := darwin/arm64 darwin/amd64 linux/amd64 linux/arm64 windows/amd64
@@ -22,28 +23,30 @@ $(PLATFORMS):
 	  go build -ldflags '$(LDFLAGS)' \
 	  -o $(BUILD)/$$os-$$arch/$(BINARY)$$ext .
 
-# Build all targets, then archive each as build/<binary>-<os>-<arch>.<ext>.
+# Build all targets, then archive each into dist/ for a GitHub release. Keeping
+# artifacts out of build/ leaves that holding only intermediates, and lets the
+# release workflow upload a clean dist/* glob.
 #
 # Names are deliberately version-less so install.sh can use GitHub's
 # /releases/latest/download/<name> redirect and skip the API (no JSON parsing,
 # no unauthenticated rate limit). The release tag carries the version, and the
 # binary reports its own via `godot-editor-console-mcp version`.
 #
-# tar.gz on unix so the installer can stream straight into place
-# (`curl ... | tar -xz`); unzip can't read stdin. zip on Windows.
+# zip on every platform, matching gdaddon and repoview -- one format across all
+# three repos, so the shared installer body only ever exercises one path here.
+# Archives are flat: a single bare executable at the root, which is what the
+# installer's `[ -f "$$tmp/$$BINARY" ]` check expects.
 package: all
-	@for p in $(PLATFORMS); do \
+	@mkdir -p $(DIST); \
+	for p in $(PLATFORMS); do \
 	  os=$${p%/*}; arch=$${p#*/}; \
-	  stem=$(BINARY)-$$os-$$arch; \
-	  if [ "$$os" = "windows" ]; then \
-	    echo "packaging $$stem.zip"; \
-	    ( cd $(BUILD)/$$os-$$arch && rm -f ../$$stem.zip && zip -j -q ../$$stem.zip $(BINARY).exe ); \
-	  else \
-	    echo "packaging $$stem.tar.gz"; \
-	    ( cd $(BUILD)/$$os-$$arch && rm -f ../$$stem.tar.gz && tar -czf ../$$stem.tar.gz $(BINARY) ); \
-	  fi; \
+	  ext=$$( [ "$$os" = "windows" ] && echo .exe || echo ); \
+	  name=$(BINARY)-$$os-$$arch.zip; \
+	  echo "packaging $$name"; \
+	  rm -f $(DIST)/$$name; \
+	  ( cd $(BUILD)/$$os-$$arch && zip -j -q ../../$(DIST)/$$name $(BINARY)$$ext ); \
 	done; \
-	echo "done -> $(BUILD)/$(BINARY)-*.{tar.gz,zip}"
+	echo "done -> $(DIST)/"
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD) $(DIST)

@@ -42,13 +42,15 @@ Covers macOS (arm64/amd64) and Linux (amd64/arm64). On **Windows**, grab the `.z
 ```bash
 make            # host build      -> build/<os>-<arch>/godot-editor-console-mcp
 make all        # release targets -> build/{darwin,linux}-{amd64,arm64}/, windows-amd64/
-make package    # build all, then archive each -> build/<binary>-<os>-<arch>.{tar.gz,zip}
-make clean      # remove build/
+make package    # build all, then zip each -> dist/<binary>-<os>-<arch>.zip
+make clean      # remove build/ and dist/
 ```
 
 Archive names are version-less on purpose, so `install.sh` can use GitHub's
-`/releases/latest/download/<name>` redirect without an API call. Upload the
-`build/` archives to the release as-is.
+`/releases/latest/download/<name>` redirect without an API call.
+
+Releases are cut by tag: pushing a `v*` tag runs `.github/workflows/release.yml`, which
+packages every target and attaches `dist/*` to the release. No manual upload step.
 
 Builds are static (`CGO_ENABLED=0`) and stripped. The Windows target is `godot-editor-console-mcp.exe`.
 The version is stamped in from the git tag (`git describe`); `godot-editor-console-mcp version`
