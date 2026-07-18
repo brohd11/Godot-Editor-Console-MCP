@@ -1,7 +1,7 @@
 #!/bin/sh
 # Install the godot-editor-console MCP server into ~/.local/bin.
 #
-#   curl -fsSL https://raw.githubusercontent.com/brohd11/Godot-Editor-Console-MCP/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/brohd11/godot-editor-console-mcp/main/install.sh | sh
 #
 # Env overrides:
 #   BIN_DIR=/usr/local/bin   install target   (default: ~/.local/bin)
@@ -14,7 +14,7 @@
 set -eu
 
 # ---- config ----
-REPO="brohd11/Godot-Editor-Console-MCP"
+REPO="brohd11/godot-editor-console-MCP"
 BINARY="godot-editor-console-mcp"
 ARCHIVE_EXT="zip"
 SUPPORTED="darwin-arm64 darwin-amd64 linux-amd64 linux-arm64"

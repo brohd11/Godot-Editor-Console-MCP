@@ -21,21 +21,15 @@ Claude Code ──stdio MCP──▶ godot-editor-console-mcp ──TCP 127.0.0.
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/brohd11/Godot-Editor-Console-MCP/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/brohd11/godot-editor-console-mcp/main/install.sh | sh
 ```
 
-Installs to `~/.local/bin` and prints the `claude mcp add` line to run. Prefer to read
-before you pipe to a shell? Same thing in two steps:
-
-```bash
-curl -fsSL -o install.sh https://raw.githubusercontent.com/brohd11/Godot-Editor-Console-MCP/main/install.sh
-less install.sh && sh install.sh
-```
+Installs to `~/.local/bin` and prints the `claude mcp add` line to run.
 
 Overrides: `BIN_DIR=/usr/local/bin` to install elsewhere, `VERSION=v0.1.0-beta` to pin a release.
 
 Covers macOS (arm64/amd64) and Linux (amd64/arm64). On **Windows**, grab the `.zip` from the
-[Releases](https://github.com/brohd11/Godot-Editor-Console-MCP/releases) page and unzip it.
+[Releases](https://github.com/brohd11/godot-editor-console-mcp/releases) page and unzip it.
 
 ## Build
 
